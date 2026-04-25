@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kuis SMKN 3 Jember</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            padding: 30px;
+        }
+
+        h1 {
+            color: navy;
+        }
+
+        #kotak {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 20px auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 16px;
+            border: 2px solid navy;
+            border-radius: 8px;
+            background: white;
+            color: navy;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: navy;
+            color: white;
+        }
+
+        .btn-level {
+            font-size: 17px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .btn-level.mudah {
+            border-color: green;
+            color: green;
+        }
+
+        .btn-level.mudah:hover {
+            background: green;
+            color: white;
+        }
+
+        .btn-level.susah {
+            border-color: red;
+            color: red;
+        }
+
+        .btn-level.susah:hover {
+            background: red;
+            color: white;
+        }
+
+        #timer {
+            color: red;
+            font-size: 20px;
+        }
+
+        #skor {
+            color: green;
+            font-size: 20px;
+        }
+
+        #labelLevel {
+            font-size: 14px;
+            color: gray;
+            margin-bottom: 5px;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: navy;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🎮 Kuis SMKN 3 Jember</h1>
+
+    <div id="kotak">
+
+        <!-- Layar Awal: Pilih Level -->
+        <div id="layarAwal">
+            <p>Pilih level kesulitan:</p>
+            <br>
+            <button class="btn-level mudah" onclick="mulai('mudah')">😊 Mudah — 5 soal, waktu 60 detik</button>
+            <button class="btn-level susah" onclick="mulai('susah')">🔥 Susah — 10 soal, waktu 30 detik</button>
+        </div>
+
+        <!-- Layar Soal -->
+        <div id="layarSoal" style="display:none">
+            <div id="labelLevel"></div>
+            <div id="timer"></div>
+            <div id="skor">⭐ Skor: 0</div>
+            <hr>
+            <p id="nomorSoal"></p>
+            <p id="soal" style="font-size:18px"></p>
+            <div id="pilihan"></div>
+        </div>
+
+        <!-- Layar Selesai -->
+        <div id="layarSelesai" style="display:none">
+            <h2>🎉 Kuis Selesai!</h2>
+            <p id="hasilAkhir" style="font-size:20px; margin:15px 0;"></p>
+            <button onclick="location.reload()" style="background:navy; color:white; border:none;">Main Lagi</button>
+        </div>
+
+    </div>
+
+    <a href="index.html">⬅ Kembali ke Beranda</a>
+
+    <script>
+
+        // ===== DAFTAR SOAL =====
+        // Soal mudah (5 soal pertama)
+        var soalMudah = [
+            {
+                soal: "Apa nama lagu yang dinyanyikan saat upacara hari Senin?",
+                jawaban: "Indonesia Raya",
+                pilihan: ["Bagimu Negeri", "Indonesia Raya", "Garuda Pancasila", "Halo-Halo Bandung"]
+            },
+            {
+                soal: "Di mana siswa biasanya makan saat jam istirahat?",
+                jawaban: "Kantin",
+                pilihan: ["Laboratorium", "Ruang Guru", "Kantin", "Gudang"]
+            },
+            {
+                soal: "Alat apa yang digunakan untuk menulis di papan tulis?",
+                jawaban: "Spidol",
+                pilihan: ["Pulpen", "Pensil", "Krayon", "Spidol"]
+            },
+            {
+                soal: "Sikap yang benar saat bertemu guru di koridor adalah?",
+                jawaban: "Menyapa dan memberi salam",
+                pilihan: ["Lari menjauh", "Pura-pura tidak lihat", "Menyapa dan memberi salam", "Berdiam diri"]
+            },
+            {
+                soal: "Apa fungsi utama dari tata tertib sekolah?",
+                jawaban: "Mendisiplinkan siswa",
+                pilihan: ["Menghukum siswa", "Mendisiplinkan siswa", "Membuat siswa takut", "Hiasan dinding"]
+            }
+        ];
+
+        // Soal susah (10 soal)
+        var soalSusah = [
+            {
+                soal: "Apa kepanjangan dari SMKN?",
+                jawaban: "Sekolah Menengah Kejuruan Negeri",
+                pilihan: ["Sekolah Menengah Kreatif Nasional", "Sekolah Menengah Kejuruan Negeri", "Sekolah Maju Karya Nusantara", "Sekolah Modern Keterampilan Negeri"]
+            },
+            {
+                soal: "Setiap hari apa biasanya siswa memakai seragam Pramuka?",
+                jawaban: "Jumat/Sabtu",
+                pilihan: ["Senin", "Selasa", "Rabu", "Jumat/Sabtu"]
+            },
+            {
+                soal: "Mana yang BUKAN tujuan dari MPLS?",
+                jawaban: "Perpeloncoan siswa baru",
+                pilihan: ["Mengenali potensi diri", "Membantu siswa beradaptasi", "Perpeloncoan siswa baru", "Menumbuhkan motivasi belajar"]
+            },
+            {
+                soal: "Apa nama kurikulum yang saat ini banyak diterapkan di sekolah?",
+                jawaban: "Kurikulum Merdeka",
+                pilihan: ["Kurikulum 2013", "Kurikulum Merdeka", "Kurikulum KTSP", "Kurikulum Nasional"]
+            },
+            {
+                soal: "Siapakah yang bertanggung jawab atas kedisiplinan siswa di sekolah?",
+                jawaban: "Waka Kesiswaan",
+                pilihan: ["Kepala Sekolah", "Waka Kurikulum", "Waka Kesiswaan", "Guru BK"]
+            },
+            {
+                soal: "Apa singkatan dari BK di sekolah?",
+                jawaban: "Bimbingan Konseling",
+                pilihan: ["Badan Keamanan", "Bimbingan Konseling", "Biro Keuangan", "Bagian Kebersihan"]
+            },
+            {
+                soal: "Dokumen resmi yang berisi aturan siswa di sekolah disebut?",
+                jawaban: "Tata Tertib",
+                pilihan: ["Piagam", "Tata Tertib", "Laporan", "Silabus"]
+            },
+            {
+                soal: "Apa kepanjangan dari OSIS?",
+                jawaban: "Organisasi Siswa Intra Sekolah",
+                pilihan: ["Organisasi Siswa Intra Sekolah", "Organisasi Sekolah Intra Siswa", "Organisasi Siswa Indonesia Sekolah", "Organisasi Sosial Intra Sekolah"]
+            },
+            {
+                soal: "Kegiatan belajar mengajar di luar kelas biasanya disebut?",
+                jawaban: "Outing Class",
+                pilihan: ["Ekskursi", "Outing Class", "Studi Tour", "Field Trip"]
+            },
+            {
+                soal: "Apa nama kegiatan penerimaan siswa baru di sekolah?",
+                jawaban: "MPLS",
+                pilihan: ["MOS", "MPLS", "OSPEK", "PPDB"]
+            }
+        ];
+
+        // ===== VARIABEL =====
+        var soalList = [];
+        var nomorSekarang = 0;
+        var skor = 0;
+        var waktu = 0;
+        var timer;
+
+        // ===== FUNGSI MULAI =====
+        function mulai(level) {
+            // Tentukan soal dan waktu berdasarkan level
+            if (level === 'mudah') {
+                soalList = soalMudah;
+                waktu = 60;
+                document.getElementById("labelLevel").innerText = "😊 Level: Mudah";
+            } else {
+                soalList = soalSusah;
+                waktu = 30;
+                document.getElementById("labelLevel").innerText = "🔥 Level: Susah";
+            }
+
+            // Reset variabel
+            nomorSekarang = 0;
+            skor = 0;
+
+            // Ganti layar
+            document.getElementById("layarAwal").style.display = "none";
+            document.getElementById("layarSoal").style.display = "block";
+
+            // Jalankan timer
+            document.getElementById("timer").innerText = "⏱ Waktu: " + waktu;
+            timer = setInterval(function () {
+                waktu--;
+                document.getElementById("timer").innerText = "⏱ Waktu: " + waktu;
+                if (waktu <= 0) {
+                    clearInterval(timer);
+                    selesai();
+                }
+            }, 1000);
+
+            tampilkanSoal();
+        }
+
+        // ===== FUNGSI TAMPILKAN SOAL =====
+        function tampilkanSoal() {
+            if (nomorSekarang >= soalList.length) {
+                clearInterval(timer);
+                selesai();
+                return;
+            }
+
+            var data = soalList[nomorSekarang];
+
+            document.getElementById("nomorSoal").innerText = "Soal " + (nomorSekarang + 1) + " dari " + soalList.length;
+            document.getElementById("soal").innerText = data.soal;
+
+            var kotakPilihan = document.getElementById("pilihan");
+            kotakPilihan.innerHTML = "";
+
+            for (var i = 0; i < data.pilihan.length; i++) {
+                var tombol = document.createElement("button");
+                tombol.innerText = data.pilihan[i];
+
+                tombol.onclick = (function (jawaban) {
+                    return function () { cekJawaban(jawaban); };
+                })(data.pilihan[i]);
+
+                kotakPilihan.appendChild(tombol);
+            }
+        }
+
+        // ===== FUNGSI CEK JAWABAN =====
+        function cekJawaban(pilihan) {
+            var jawabanBenar = soalList[nomorSekarang].jawaban;
+
+            if (pilihan === jawabanBenar) {
+                skor = skor + 10;
+            } else {
+                skor = skor - 5;
+            }
+
+            document.getElementById("skor").innerText = "⭐ Skor: " + skor;
+            nomorSekarang++;
+            tampilkanSoal();
+        }
+
+        // ===== FUNGSI SELESAI =====
+        function selesai() {
+            document.getElementById("layarSoal").style.display = "none";
+            document.getElementById("layarSelesai").style.display = "block";
+            document.getElementById("hasilAkhir").innerText = "Skor kamu: " + skor + " dari " + (soalList.length * 10);
+        }
+
+    </script>
+
+</body>
+
+</html>
